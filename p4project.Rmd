@@ -1,0 +1,604 @@
+Exploring white wine data by Krishna Ganapathi
+========================================================
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+# Load all of the packages that you end up using in your analysis in this code
+# chunk.
+
+# Notice that the parameter "echo" was set to FALSE for this code chunk. This
+# prevents the code from displaying in the knitted HTML output. You should set
+# echo=FALSE for all code chunks in your file, unless it makes sense for your
+# report to show the code that generated a particular plot.
+
+# The other parameters for "message" and "warning" should also be set to FALSE
+# for other code chunks once you have verified that each plot comes out as you
+# want it to. This will clean up the flow of your report.
+
+getwd()
+
+library(ggplot2)
+library(GGally)
+library(gridExtra)
+library(dplyr)
+```
+
+```{r echo=FALSE, Load_the_Data}
+# Load the Data
+wines <- read.csv(file ="wineQualityWhites.csv")
+
+head(wines)
+```
+
+We are using a dataset in order to figure out what qualities affect the acidic property of white wines. The data that we have loaded consist of white wines and the breakdown of its compnents, The components are discussed more below.  We can see that all inputs are numeric in nature. This allows us to work with a cleaner dataset and we don't have to do any extra cleaning of the data.
+
+# Univariate Plots Section
+
+The components we see below are the key category compositions of several white wines. We have fixed acidity, volatile acidity and citric acid. furhter more we have sugar, chlorides, and sulfur dioxide. Finally we have density, PH, sulfates, alcohol content and the quality of the wine. We will see how these categories influence the quality of the wines.
+
+```{r echo=FALSE}
+summary(wines)
+```
+
+```{r echo=FALSE, Univariate_Plots, message=FALSE, warning=FALSE, packages=FALSE}
+#alcohol
+qplot(x = alcohol, data = wines, color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(8,14), name = "Alcohol [%]" )+ 
+  ggtitle("Count of wine by Alcohol %")
+
+#A majority of the data here happens after 8% so i set the limits from 8 to 14. The set limits allow us to focus on the center most important chunk of the data
+```
+
+Most of the wines with the highest alcohol content happen between intervals. We can almost see a bimodal distribution.
+
+
+```{r echo=FALSE,message=FALSE, warning=FALSE, packages=FALSE}
+
+#quality
+#qplot(x = quality, data = wines, color = I('black'), fill = I('#099DD9')) + 
+
+counts <- table(wines$quality)
+
+barplot(counts, xlab = "Quality", ylab = "Count", col=c("sky blue"), main = "Count of wines by Quality")  
+  
+  
+
+```
+
+This is pretty much a normal distribution. we see that most wines have a quality between 5 and 7 (inclusive). The middle value of 6 is associated with the highest count of wines.   
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#PH, sulphates
+plot4 <- qplot(x = pH, data = wines, color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c())
+
+plot5 <-qplot(x = sulphates, data = wines, 
+              color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c())
+
+grid.arrange(plot4, plot5, ncol = 2, 
+             top ="Count of wines by PH vs Count of wines by sulphates" )
+
+                           
+  
+```
+
+Again we see something expected. knowin that alcohol in general is acidic I didn't expect to see this go past 5 or 6 on the PH scale. Our data shows that all of our data is less than 4 and clusters around a PH of 3.1-3.2.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#Density 
+
+qplot(x = density, data = wines, color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(), name = "Density [Kg/L]") +
+  ggtitle("Count of Wines by how dense they are")
+
+```
+
+
+This surprised me a little bit but upon further research I found that wines are mostly water so the density of wines should be similar to the density of water which is 1.000 Kg/L. Dry wines are even less dense; we see a greater density in wines and this might be because of alchol and sugar content.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#chlorides, free sulfur dioxide, total sulfur dioxide
+
+plot1 <- qplot(x = chlorides, data = wines, 
+               color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c())
+
+plot2 <- qplot(x = free.sulfur.dioxide, data = wines, 
+               color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c())
+
+plot3 <- qplot(x = total.sulfur.dioxide, data = wines, 
+               color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c())
+
+grid.arrange(plot1,plot2,plot3, ncol = 3, top = 
+               "Chlorides vs Free sulfur dioxide vs Total sulfur dioxide")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#Residual Sugar
+
+qplot(x = residual.sugar, data = wines, 
+      color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(), name = "Residual Sugar [g]") +
+  ggtitle("count of wines by amount of residual sugar")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#Citric Acid, Fixed acidity, volatile acidity
+#set limits from 0 to 1 because everything after 1 is very miniscule
+
+plot6 <- qplot(x = citric.acid, data = wines, 
+               color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(0,1)) 
+
+#set limits from 0 to 11 because everything after 11 is small
+plot7 <- qplot(x = fixed.acidity, data = wines, 
+               color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c(0,11)) 
+
+plot8 <- qplot(x = volatile.acidity, data = wines, 
+               color = I('black'), fill = I('#099DD9')) + 
+  scale_x_continuous(limits = c())
+
+grid.arrange(plot6,plot7,plot8, ncol = 3, top = 
+               "Comparison of count of wines by acidity variables ")
+```
+
+
+# Univariate Analysis
+
+
+### What is the structure of your dataset?
+
+The structure of my Dataset is closed having several key variables. These variables are all continuous within their distributions.
+
+### What is/are the main feature(s) of interest in your dataset?
+
+The main features of interest in my dataset are alcohol content, density, acidity, and sulfate content. I believe that these variables are the variables that will help me find the answer to the question proposed during the introduction of "what qualities affect the acidic property of wines.". 
+
+### What other features in the dataset do you think will help support your \
+investigation into your feature(s) of interest?
+
+I think that an investigation into how residual sugar affects the acidity will help support my findings.
+
+### Did you create any new variables from existing variables in the dataset?
+
+I did not create any new variables in the dataset.
+
+### Of the features you investigated, were there any unusual distributions? \
+Did you perform any operations on the data to tidy, adjust, or change the form \
+of the data? If so, why did you do this?
+
+Upon analysis of the data, I found that the data was clean enough to start plotting with. I did some cleaning while plotting the data on various plots to get the most useful data on the plots.
+
+# Bivariate Plots Section
+
+```{r echo=FALSE, Bivariate_Plots, message=FALSE, warning=FALSE, packages=FALSE}
+#Alcohol vs density
+
+p1 <- ggplot(subset(wines, alcohol < quantile(alcohol, .99) &
+               density < quantile(density,.99)), 
+       aes(x = density, y = alcohol)) +
+  geom_point(alpha = 0.3) + geom_smooth(method = "lm", se = FALSE,size=1) +
+  ggtitle("Alcohol vs Density") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Alcohol [%]")
+
+p1
+
+cor(wines$alcohol, wines$density)
+```
+
+I wanted to look at alcohol vs Density but this graph doesn't tell us much. I added the correlation function to see how closely the 2 variables are related to each other and we get a correlation of -.78. This is a strong correlation because strong correlations are either > .7 or < -.7. I would like to see how other variables will affect this graph in my analysis. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#residual sugar vs alcohol
+
+p2 <- ggplot(subset(wines, alcohol < quantile(alcohol, .99) &
+               residual.sugar < quantile(residual.sugar,.99)), 
+       aes(x = alcohol, y = residual.sugar)) +
+  geom_point(alpha = 0.3) + geom_smooth(method = "lm", se = FALSE,size=1) +
+  ggtitle("Residual Sugar vs Alcohol") + 
+  scale_x_continuous(name = "Alcohol [%]") +
+  scale_y_continuous(name = "Residual Sugar [g]")
+
+p2
+
+
+```
+
+I wanted to now see how residual sugar and alcohol effects quality.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#Density vs Sulphates
+p3 <- ggplot(subset(wines, density < quantile(density, .99) &
+               sulphates < quantile(sulphates,.99)), 
+       aes(x = density, y = sulphates)) +
+  geom_point(alpha = 0.3) + geom_smooth(method = "lm", se = FALSE,size=1) +
+  ggtitle("Sulphates vs Density") + 
+  scale_x_continuous(name = "Density [kg/L]") + 
+  scale_y_continuous(name = "Sulphates [g]")
+
+p3
+
+
+```
+
+I really had the feeling that density and sulphates had a bigger influence on all aspects of wine acidity and I wanted to really eplore this here in this section.
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. How did the feature(s) of interest vary with other features in \
+the dataset?
+
+From the first 2 plots I want to say that as quality goes up density goes down and alcohol quantity tends to go up.
+
+Following this I wanted to see how density and sulphates affect quality. I have a feeling that acidity goes up as density and sulphates go down. 
+
+I also wanted to see how density and sulphates affected acidity. We saw that density and sulphates didn't really have an affect on acidity. 
+
+### Did you observe any interesting relationships between the other features \
+(not the main feature(s) of interest)?
+
+I did not observe any other relationships.
+
+
+### What was the strongest relationship you found?
+
+The strongest relationship I kept observing was that the quality goes up as density goes down and as alcohol quantity goes up.
+
+
+#Multivariate Plots Section
+
+Building upon the graphs in the previous section I wanted to see how much further I can analyze these variables
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+
+ggplot(subset(wines, alcohol < quantile(alcohol, .99) &
+               density < quantile(density,.99)), 
+       aes(x = density, y = alcohol, color = factor(quality))) +
+  geom_point() + 
+  scale_color_brewer(type='seq') +
+  ggtitle("Alcohol vs Density vs Quality (encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Alcohol [%]")
+
+```
+
+I went ahead and colored it in by quality. This tells me that as the alcohol level goes up and density goes down the quality goes up. I have a feeling that people just like a lot of alcohol that is easy to drink.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+
+  ggplot(aes(y = alcohol, 
+           x = density   , color = fixed.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5) +
+  ggtitle("Alcohol vs Density vs Fixed Acidity") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Alcohol [%]")
+
+```
+
+fixed acidity also is in line with the quality analysis from above. As the alcohol level goes up the fixed acidity level goes down.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+
+ggplot(aes(y = alcohol, 
+           x = density   , color = volatile.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5) + 
+  ggtitle("Alcohol vs Density vs \n Volatile Acidity") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Alcohol [%]")
+
+```
+
+volatile acidity also follows suit. we can see acidity show up more in wines that are higher in density and lower in alcohol content.
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#residual sugar vs alcohol
+
+ggplot(subset(wines, alcohol < quantile(alcohol, .99) &
+               residual.sugar < quantile(residual.sugar,.99)), 
+       aes(x = alcohol, y = residual.sugar, color = factor(quality))) +
+  geom_point(alpha = 0.3) +  geom_point() + 
+  scale_color_brewer(type='seq') +
+  ggtitle("Residual Sugar vs Alcohol vs Quality (encoded by color)") + 
+  scale_x_continuous(name = "Alcohol [%]") +
+  scale_y_continuous(name = "Residual Sugar [g]")
+
+
+```
+
+with a little bit of color we can see that quality of wines are spread out across the graph. the darkest clusters show up where alcohol is low and sugar is high and the opposite where sugar is low and alcohol is high. I am going to say that from this graph people dont usually like dessert wines.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#residual sugar vs alcohol
+
+  ggplot(aes(y = residual.sugar, 
+           x = alcohol   , color = fixed.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5) +
+  ggtitle("Residual Sugar vs Alcohol vs Fixed acidity (encoded by color)") + 
+  scale_x_continuous(name = "Alcohol [%]") +
+  scale_y_continuous(name = "Residual Sugar [g]")
+
+```
+
+Here I wanted to see what effect residual sugar and alcohol had on fixed acidity. Fixed acidity was the strongest when the alcohol content was around 10 this could have been because the grapes that were picked were grown in an environment that made them more acidic.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#residual sugar vs alcohol
+
+ggplot(aes(y = residual.sugar, 
+           x = alcohol   , color = volatile.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5) +
+  ggtitle("Residual Sugar\nvs Alcohol vs\nVolatile acidity\n(encoded by color)
+          ") + 
+  scale_x_continuous(name = "Alcohol [%]") +
+  scale_y_continuous(name = "Residual Sugar [g]")
+
+```
+
+Here I wanted to see what effect residual sugar and alcohol had on volatile acidity. As you can see volatile acidity increased as either alcohol content increased or sugar content increased.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#Density vs Sulphates
+ggplot(subset(wines, density < quantile(density, .99) &
+               sulphates < quantile(sulphates,.99)), 
+       aes(x = density, y = sulphates, color = factor(quality))) +
+  geom_point(alpha = 0.3) +  geom_point() + 
+  scale_color_brewer(type='seq') +
+  ggtitle("Sulphates vs Density vs quality (encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Sulphates [g]")
+
+```
+
+here we can see that the quality is higher as the sulphates and the density is lower.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#Density vs Sulphates
+  ggplot(aes(y = sulphates, 
+           x = density   , color = fixed.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5) +
+  ggtitle("Sulphates vs Density vs Fixed acidity (encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Sulphates [g]")
+
+```
+
+We can see that as fixed acidity goes up density and sulphates go down. But upon closer inspection we see that fixed acidity goes up as either density or sulphates are low as we see 2 different clusters of orange more towards the x and y axes.
+
+```{r echo=FALSE,message=FALSE, warning=FALSE, packages=FALSE}
+#Density vs Sulphates
+ggplot(subset(wines, density < quantile(density, .99) &
+               sulphates < quantile(sulphates,.99)), 
+       aes(x = density, y = sulphates, color = factor(volatile.acidity))) +
+  geom_point(alpha = 0.3) + scale_color_brewer(type='seq') +
+  ggtitle("Sulphates\nvs Density vs\nVolatile Acidity\n(encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Sulphates [g]")
+
+
+```
+
+we see here that volatile acidity stays more constant as density and sulphates change. We see the greatest density of blue clustered closer towards a little right of center. 
+
+```{r echo=FALSE,message=FALSE, warning=FALSE, packages=FALSE}
+#Density vs Sulphates
+ggplot(aes(y = sulphates, 
+           x = density   , color = volatile.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5)  +
+  ggtitle("Sulphates\nvs Density vs\nVolatile acidity\n(encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Sulphates [g]")
+
+
+```
+
+In case my eyes were tricking me I wanted to know if my conclusion above was correct.
+
+
+```{r echo=FALSE, Multivariate_Plots, message=FALSE, warning=FALSE, packages=FALSE}
+#winequality vs alcohol vs fixed acidity 
+wines$alcohol.bucket = cut(wines$alcohol,
+                            c(8, 9, 10.5, 12, 16))
+
+ggplot(aes(x = factor(quality), y = fixed.acidity), data = wines) + 
+   geom_boxplot(aes(fill = alcohol.bucket))  +
+  ggtitle("Fixed Acidity vs Alcohol Vs Quality") + 
+  scale_x_discrete(name = "Qualtiy") +
+  scale_y_continuous(name = "Fixed Acidity")
+
+
+
+```
+
+The higher the quality of wines we also get a higher alcohol content and closer to 7 for fixed acidity
+
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#winequality vs density vs fixed acidity 
+
+  ggplot(aes(y = quality, 
+           x = density   , color = fixed.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5)  +
+  ggtitle("Quality vs Density vs Fixed acidity") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_discrete(name = "Quality")
+
+```
+
+higher the quality of wines the lower the density and the more closer to 7 for the level of fixed acidity
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#winequality vs alcohol vs volatile acidity 
+
+ggplot(aes(y = quality, 
+           x = alcohol   , color = volatile.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5)  +
+  ggtitle("Quality\nvs Alcohol vs\nVolatile acidity\n(encoded by color)") + 
+  scale_x_continuous(name = "Alcohol [%]") +
+  scale_y_discrete(name = "Quality")
+
+```
+
+If the quality is higher the alcohol content and volatile acidity seems to go up
+
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#winequality vs density vs volatile acidity 
+
+ggplot(aes(y = quality, 
+           x = density   , color = volatile.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5)  +
+  ggtitle("Quality\nvs Density vs\nVolatile Acidity\n(encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_discrete(name = "Quality")
+```
+
+Quality and volatile acidity both go up as density goes down.
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#PH vs density vs Fixed acidity 
+  ggplot(aes(y = pH, 
+           x = density   , color = fixed.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5)  +
+  ggtitle("PH vs Density vs Fixed Acidity (encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "PH")
+```
+
+As fixed acidity goes up as PH goes down and density goes down.
+
+```{r echo = FALSE, message=FALSE, warning=FALSE, packages=FALSE}
+#PH vs density vs volatile acidity 
+
+ggplot(aes(y = pH, 
+           x = density   , color = volatile.acidity), 
+       data = wines) +
+      geom_point(alpha = 0.8, size = 1.5) +
+  ggtitle("PH\nvs Density vs\nVolatile Acidity\n(encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "PH")
+
+```
+
+Volatile acidity also goes up as PH & density goes down. 
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \
+investigation. Were there features that strengthened each other in terms of \
+looking at your feature(s) of interest?
+
+From the first 2 plots we can see that as quality goes up density goes down and alcohol quantity tends to go up. As I continued to investigate I saw that sugar affects quality of the alcohol negatively. As the sugar goes up the quality tends to go down. I then wanted to see how the residual sugar affected acidity. I found out that acidity is more affected by the alcohol content than residual sugar. 
+
+Revisiting what effects density and sulphates have on acidity, I observed that as fixed acidity goes up density and sulphates go down. But upon closer inspection we see that fixed acidity goes up as either density or sulphates are low.
+
+### Were there any interesting or surprising interactions between features?
+
+No I did not find any interesting or surprising interactions between features. I had a couple of hunches from the bivarate analysis section and those hunches turned out to be true.
+
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the \
+strengths and limitations of your model.
+
+I did not create any new models in my dataset.
+
+------
+
+# Final Plots and Summary
+
+
+### Plot One
+```{r echo=FALSE, Plot_One, message=FALSE, warning=FALSE, packages=FALSE}
+
+ggplot(subset(wines, alcohol < quantile(alcohol, .99) &
+               density < quantile(density,.99)), 
+       aes(x = density, y = alcohol, color = factor(quality))) +
+  geom_point() +
+  geom_vline(aes(xintercept=mean(density, na.rm=T)),
+             color="red", linetype="dashed", size=1) + 
+  geom_smooth(method="lm", se = FALSE,size=1) +
+  scale_color_brewer(type='seq') + 
+  ggtitle("Alcohol vs Density vs Quality (encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Alcohol [%]")
+
+
+```
+
+I Picked this plot because it told me the heart of what was in the data set. I wanted to know how quality is affected given alcohol and density and this graph is very clear about that. Quality goes up as Alcohol goes up and density goes down.
+
+### Plot Two
+```{r echo=FALSE, Plot_Two, message=FALSE, warning=FALSE, packages=FALSE}
+
+#residual sugar vs alcohol
+
+ggplot(subset(wines, alcohol < quantile(alcohol, .99) &
+               residual.sugar < quantile(residual.sugar,.99)), 
+       aes(x = alcohol, y = residual.sugar, color = factor(quality))) +
+  geom_point(alpha = 0.3) +  geom_point() +  
+  geom_vline(aes(xintercept=mean(alcohol, na.rm=T)),
+             color="red", linetype="dashed", size=1) + 
+  geom_smooth(method="lm", se = FALSE,size=1) +
+  scale_color_brewer(type='seq') +
+  ggtitle("Residual Sugar vs Alcohol vs Quality (encoded by color)") + 
+  scale_x_continuous(name = "Alcohol [%]") +
+  scale_y_continuous(name = "Residual Sugar [g]")
+
+```
+
+I picked this Graph because it tells me about the other variable I was interested in and how it affects quality. We can see from the graph that quality increases as either alcohol or residual sugar increases but there is a bigger cluster of quality as alcohol content increases.
+
+
+### Plot Three 
+```{r echo=FALSE, Plot_Three, message=FALSE, warning=FALSE, packages=FALSE}
+
+#Density vs Sulphates
+ggplot(subset(wines, density < quantile(density, .99) &
+               sulphates < quantile(sulphates,.99)), 
+       aes(x = density, y = sulphates, color = factor(quality))) +
+  geom_point(alpha = 0.3) +  geom_point() + 
+   geom_vline(aes(xintercept=mean(density, na.rm=T)),
+             color="red", linetype="dashed", size=1) + 
+  geom_smooth(method="lm", se = FALSE,size=1) +
+  scale_color_brewer(type='seq') +
+  ggtitle("Sulphates vs Density vs quality (encoded by color)") + 
+  scale_x_continuous(name = "Density [Kg/L]") +
+  scale_y_continuous(name = "Sulphates [g]")
+
+
+
+
+```
+
+Finally I picked this graph because it shows us how sulphates affect quality. The Quality of the wines increase as the sulphates increase and the density decreases. People like their wines with more sulphates in them.
+
+------
+
+# Reflection
+
+I came into this project really excited about the undertaking of it. The biggest Challenge I had while working throughout this project was making sure that I was following my analysis consistently. I would get a new idea and graph it but i had to keep asking myself if the graph I was getting was pertinent to my discussion and what I was trying to explore and the questions I was trying to answer. I also took a while to complete this project because I was offered a job back in march but the struggle of not having a solid housing situation for a while and moving from location to location made this project even more arduous to complete.
+
+What went well was my initial single variable analysis of the project. I was able to draw from memory all of the code needed. I required some help for the bivariate and multivariate parts.  I think what was surprising was that Acidity stayed relatively constant despite influences from sugar, sulphates and alcohol. I also thought that a higher acidity would mean that the quality would go down but the quality was more correlated with alcohol than any of the other variables.
+
+I think what we can do more with the data set is figure out which of these factors influence alcohol content and by how much alcohol content varies across investigations given different factors.
+
